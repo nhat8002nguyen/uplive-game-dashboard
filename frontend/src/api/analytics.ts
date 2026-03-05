@@ -1,14 +1,14 @@
 import axios from 'axios'
 import type { AnalyticsEntry, AnalyticsSummary, CreateAnalyticsEntry, FilterParams, PaginatedAnalyticsResponse } from '../types/analytics'
 
-const api = axios.create({ baseURL: 'http://localhost:3000' })
+const api = axios.create({ baseURL: '' })
 
 export const exportAnalytics = (params: FilterParams, format: 'csv' | 'json'): void => {
   const entries = Object.entries({ ...params, format })
     .filter(([key, val]) => val != null && val !== '' && key !== 'limit' && key !== 'offset')
     .map(([key, val]) => [key, String(val)] as [string, string])
   const query = new URLSearchParams(entries).toString()
-  window.open(`http://localhost:3000/analytics/export?${query}`, '_blank')
+  window.open(`/analytics/export?${query}`, '_blank')
 }
 
 export const fetchAnalytics = async (params?: FilterParams): Promise<PaginatedAnalyticsResponse> => {

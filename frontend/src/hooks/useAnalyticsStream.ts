@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { AnalyticsEntry } from '../types/analytics'
 
-const STREAM_URL = 'http://localhost:3000/analytics/stream'
+const STREAM_URL = '/analytics/stream'
 
 export const useAnalyticsStream = (onNewEntry: (entry: AnalyticsEntry) => void) => {
   const [isConnected, setIsConnected] = useState(false)
