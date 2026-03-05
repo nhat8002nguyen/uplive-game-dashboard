@@ -3,6 +3,14 @@ import type { AnalyticsEntry, AnalyticsSummary, CreateAnalyticsEntry, FilterPara
 
 const api = axios.create({ baseURL: 'http://localhost:3000' })
 
+export const exportAnalytics = (params: FilterParams, format: 'csv' | 'json'): void => {
+  const entries = Object.entries({ ...params, format })
+    .filter(([key, val]) => val != null && val !== '' && key !== 'limit' && key !== 'offset')
+    .map(([key, val]) => [key, String(val)] as [string, string])
+  const query = new URLSearchParams(entries).toString()
+  window.open(`http://localhost:3000/analytics/export?${query}`, '_blank')
+}
+
 export const fetchAnalytics = async (params?: FilterParams): Promise<AnalyticsEntry[]> => {
   const { data } = await api.get<{ data: AnalyticsEntry[] }>('/analytics', { params })
   return data.data

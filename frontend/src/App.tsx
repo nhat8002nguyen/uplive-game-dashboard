@@ -1,16 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAnalytics, useSummary, useCreateAnalytic } from './hooks/useAnalytics'
 import { useTheme } from './hooks/useTheme'
+import { useAnalyticsStream } from './hooks/useAnalyticsStream'
 import { FilterBar } from './components/FilterBar'
 import { SummaryCards } from './components/SummaryCards'
 import { AnalyticsTable } from './components/AnalyticsTable'
 import { AddEntryForm } from './components/AddEntryForm'
 import { AnalyticsChart } from './components/AnalyticsChart'
+import { LiveBadge } from './components/LiveBadge'
+import { ExportButtons } from './components/ExportButtons'
+import { QUERY_KEYS } from './constants/analytics'
 import type { FilterParams, CreateAnalyticsEntry } from './types/analytics'
 
 export const App = () => {
   const [filters, setFilters] = useState<FilterParams>({})
+  const [showNewEntryNotice, setShowNewEntryNotice] = useState(false)
   const { isDark, toggle } = useTheme()
+  const queryClient = useQueryClient()
+
+  const { isConnected } = useAnalyticsStream((_entry) => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.analytics] })
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.summary] })
+    setShowNewEntryNotice(true)
+  })
+
+  useEffect(() => {
+    if (!showNewEntryNotice) return
+    const id = setTimeout(() => setShowNewEntryNotice(false), 3000)
+    return () => clearTimeout(id)
+  }, [showNewEntryNotice])
 
   const { data: entries, isLoading: loadingEntries, error: entriesError } = useAnalytics(filters)
   const { data: summary, isLoading: loadingSummary } = useSummary(filters)
@@ -29,9 +48,21 @@ export const App = () => {
               Monitor player activity across all games
             </p>
           </div>
-          <ThemeToggle isDark={isDark} onToggle={toggle} />
+          <div className="flex items-center gap-3">
+            <LiveBadge connected={isConnected} />
+            <ThemeToggle isDark={isDark} onToggle={toggle} />
+          </div>
         </div>
       </header>
+
+      {showNewEntryNotice && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded px-3 py-2">
+            <span className="text-green-500">●</span>
+            New entry received — data refreshed
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {loadingSummary && (
@@ -54,9 +85,12 @@ export const App = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-            Filter Entries
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+              Filter Entries
+            </h2>
+            <ExportButtons filters={filters} />
+          </div>
           <FilterBar onFilter={setFilters} />
         </section>
 
