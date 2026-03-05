@@ -4,6 +4,11 @@ import type { AnalyticsEntry } from '../types/analytics'
 
 interface AnalyticsTableProps {
   entries: AnalyticsEntry[]
+  total: number
+  page: number
+  pageSize: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (size: number) => void
 }
 
 type SortKey = keyof AnalyticsEntry
@@ -18,7 +23,7 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: 'timestamp', label: 'Timestamp' },
 ]
 
-export const AnalyticsTable = ({ entries }: AnalyticsTableProps) => {
+export const AnalyticsTable = ({ entries, total, page, pageSize, onPageChange, onPageSizeChange }: AnalyticsTableProps) => {
   const [sortKey, setSortKey] = useState<SortKey>('timestamp')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
@@ -39,7 +44,11 @@ export const AnalyticsTable = ({ entries }: AnalyticsTableProps) => {
     return 0
   })
 
-  if (entries.length === 0) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const startItem = total === 0 ? 0 : (page - 1) * pageSize + 1
+  const endItem = Math.min(page * pageSize, total)
+
+  if (total === 0) {
     return (
       <div className="text-center py-12 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         No data available
@@ -83,6 +92,40 @@ export const AnalyticsTable = ({ entries }: AnalyticsTableProps) => {
           ))}
         </tbody>
       </table>
+      <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
+        <span>
+          {total === 0 ? 'No entries' : `Showing ${startItem}–${endItem} of ${total}`}
+        </span>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-1.5">
+            Rows:
+            <select
+              value={pageSize}
+              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              className="border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs"
+            >
+              {[10, 20, 50].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1}
+              className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              ‹
+            </button>
+            <span className="px-2">{page} / {totalPages}</span>
+            <button
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages}
+              className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

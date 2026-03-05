@@ -27,4 +27,9 @@ export interface FilterParams {
   offset?: number
 }
 
+export interface PaginatedAnalyticsResponse {
+  entries: AnalyticsEntry[]
+  total: number
+}
+
 export type CreateAnalyticsEntry = Omit<AnalyticsEntry, 'id' | 'timestamp'>

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AnalyticsEntry, AnalyticsSummary, CreateAnalyticsEntry, FilterParams } from '../types/analytics'
+import type { AnalyticsEntry, AnalyticsSummary, CreateAnalyticsEntry, FilterParams, PaginatedAnalyticsResponse } from '../types/analytics'
 
 const api = axios.create({ baseURL: 'http://localhost:3000' })
 
@@ -11,8 +11,8 @@ export const exportAnalytics = (params: FilterParams, format: 'csv' | 'json'): v
   window.open(`http://localhost:3000/analytics/export?${query}`, '_blank')
 }
 
-export const fetchAnalytics = async (params?: FilterParams): Promise<AnalyticsEntry[]> => {
-  const { data } = await api.get<{ data: AnalyticsEntry[] }>('/analytics', { params })
+export const fetchAnalytics = async (params?: FilterParams): Promise<PaginatedAnalyticsResponse> => {
+  const { data } = await api.get<{ data: PaginatedAnalyticsResponse }>('/analytics', { params })
   return data.data
 }
 

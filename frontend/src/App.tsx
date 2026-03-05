@@ -8,13 +8,14 @@ import { SummaryCards } from './components/SummaryCards'
 import { AnalyticsTable } from './components/AnalyticsTable'
 import { AddEntryForm } from './components/AddEntryForm'
 import { AnalyticsChart } from './components/AnalyticsChart'
-import { LiveBadge } from './components/LiveBadge'
 import { ExportButtons } from './components/ExportButtons'
 import { QUERY_KEYS } from './constants/analytics'
 import type { FilterParams, CreateAnalyticsEntry } from './types/analytics'
 
 export const App = () => {
   const [filters, setFilters] = useState<FilterParams>({})
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [showNewEntryNotice, setShowNewEntryNotice] = useState(false)
   const { isDark, toggle } = useTheme()
   const queryClient = useQueryClient()
@@ -31,8 +32,15 @@ export const App = () => {
     return () => clearTimeout(id)
   }, [showNewEntryNotice])
 
-  const { data: entries, isLoading: loadingEntries, error: entriesError } = useAnalytics(filters)
-  const { data: summary, isLoading: loadingSummary } = useSummary(filters)
+  const handleFilter = (params: FilterParams) => {
+    setFilters(params)
+    setPage(1)
+  }
+
+  const paginatedFilters: FilterParams = { ...filters, limit: pageSize, offset: (page - 1) * pageSize }
+
+  const { data, isLoading: loadingEntries, error: entriesError } = useAnalytics(paginatedFilters)
+  const { data: summary, isLoading: loadingSummary } = useSummary(paginatedFilters)
   const { mutateAsync: createEntryMutation } = useCreateAnalytic()
   const createEntry = (entry: CreateAnalyticsEntry) => createEntryMutation(entry).then(() => undefined)
 
@@ -48,10 +56,7 @@ export const App = () => {
               Monitor player activity across all games
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <LiveBadge connected={isConnected} />
-            <ThemeToggle isDark={isDark} onToggle={toggle} />
-          </div>
+          <ThemeToggle isDark={isDark} onToggle={toggle} />
         </div>
       </header>
 
@@ -91,7 +96,7 @@ export const App = () => {
             </h2>
             <ExportButtons filters={filters} />
           </div>
-          <FilterBar onFilter={setFilters} />
+          <FilterBar onFilter={handleFilter} />
         </section>
 
         {loadingEntries && (
@@ -105,7 +110,16 @@ export const App = () => {
             <code className="font-mono">http://localhost:3000</code>.
           </div>
         )}
-        {entries && <AnalyticsTable entries={entries} />}
+        {data && (
+          <AnalyticsTable
+            entries={data.entries}
+            total={data.total}
+            page={page}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(s) => { setPageSize(s); setPage(1) }}
+          />
+        )}
       </main>
     </div>
   )
