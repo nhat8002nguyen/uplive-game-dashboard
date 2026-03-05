@@ -148,3 +148,8 @@ uplive-interview/
 ├── README.md
 └── PROCESS.md        # Process documentation & AI usage
 ```
+
+## Screenshots
+<img width="1903" height="1005" alt="image" src="https://github.com/user-attachments/assets/e4f2c73b-ce58-4c67-b015-d5618799976d" />
+
+<img width="1904" height="1007" alt="image" src="https://github.com/user-attachments/assets/33a06475-1324-4407-a349-b46ffa0902b8" />
