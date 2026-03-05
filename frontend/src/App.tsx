@@ -20,7 +20,7 @@ export const App = () => {
   const { isDark, toggle } = useTheme()
   const queryClient = useQueryClient()
 
-  const { isConnected } = useAnalyticsStream((_entry) => {
+  useAnalyticsStream((_entry) => {
     queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.analytics] })
     queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.summary] })
     setShowNewEntryNotice(true)

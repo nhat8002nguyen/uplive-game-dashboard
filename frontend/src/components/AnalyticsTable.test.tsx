@@ -26,7 +26,7 @@ const mockEntries: AnalyticsEntry[] = [
 
 describe('AnalyticsTable', () => {
   it('renders rows from entries prop', () => {
-    render(<AnalyticsTable entries={mockEntries} />)
+    render(<AnalyticsTable entries={mockEntries} total={2} page={1} pageSize={20} onPageChange={() => {}} onPageSizeChange={() => {}} />)
     expect(screen.getByText('Super Game')).toBeInTheDocument()
     expect(screen.getByText('Mega Game')).toBeInTheDocument()
     expect(screen.getByText('player-1')).toBeInTheDocument()
@@ -35,7 +35,7 @@ describe('AnalyticsTable', () => {
   })
 
   it('shows "No data" when empty', () => {
-    render(<AnalyticsTable entries={[]} />)
+    render(<AnalyticsTable entries={[]} total={0} page={1} pageSize={20} onPageChange={() => {}} onPageSizeChange={() => {}} />)
     expect(screen.getByText(/no data/i)).toBeInTheDocument()
   })
 })
