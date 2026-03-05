@@ -40,7 +40,7 @@ export const App = () => {
   const paginatedFilters: FilterParams = { ...filters, limit: pageSize, offset: (page - 1) * pageSize }
 
   const { data, isLoading: loadingEntries, error: entriesError } = useAnalytics(paginatedFilters)
-  const { data: summary, isLoading: loadingSummary } = useSummary(paginatedFilters)
+  const { data: summary, isLoading: loadingSummary } = useSummary(filters)
   const { mutateAsync: createEntryMutation } = useCreateAnalytic()
   const createEntry = (entry: CreateAnalyticsEntry) => createEntryMutation(entry).then(() => undefined)
 
