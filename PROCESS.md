@@ -107,6 +107,12 @@ it should calculate for all pages available.
 DarkMode toggle didn't work. Help me debug.
 ```
 
+### Phase 10 — Deploy Scripts (Agent Mode)
+
+```
+@deploy is a template of working deploy scripts than can be run in EC2. I want to create a new deploy folder for this app @/Users/nhatnguyen/Workspaces/interview-test/uplive-interview based on the template, so I can run script on my ec2 instance.
+```
+
 ---
 
 ## Development Workflow
